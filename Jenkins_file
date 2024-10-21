@@ -1,0 +1,40 @@
+pipeline{
+    agent any
+    stages
+    {
+        stage ('git-checkout')
+        {
+            steps{
+                git branch: 'main',
+		        credentialsId: '68023ba5-8c52-4585-9a4d-adaf73bca5b1', 	
+		        url: 'https://github.com/Filzah2023/App_sample.git'
+                }
+        }         
+        stage ('build')
+        {
+            steps {
+                       bat  'mvn clean package'
+		  	       }
+        }
+	 stage ('deploy')
+	    {
+        steps {
+ 			deploy adapters:
+			 [tomcat9(credentialsId: '9c6f53e8-5c1b-4f82-8c94-8ebf08330a5a',
+			 path: '', 
+			 url: 'http://localhost:8081/')],
+			 contextPath: 'SAMPLE', war: '**/*.war'
+                      }
+        }
+    }    
+	post{
+         success{
+                       echo "deployment successful"
+           		}
+	     failure{
+			echo "something fault"
+			}
+	   }
+}
+
+			
